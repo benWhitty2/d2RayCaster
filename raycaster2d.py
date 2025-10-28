@@ -1,6 +1,7 @@
 import pygame
 import math
 
+#initalisztions 
 pygame.init()
 screen = pygame.display.set_mode((600,600))
 clock = pygame.time.Clock()
@@ -18,6 +19,7 @@ map = [[1,1,1,1,1,1,1,1,1,1,1,1],
        [1,0,0,0,0,0,0,0,0,0,0,1],
        [1,1,1,1,1,1,1,1,1,1,1,1]]
 
+#sets 0 values to 50
 def ifZero50(num):
     if num == 0:
         return 50
@@ -25,14 +27,17 @@ def ifZero50(num):
         return num
 
 
-
 def castRay(playerX,playerY,playerAngle):
+    
+    #initalises return values
     x = playerX
     y = playerY
 
+    #casts line box by box untill a solid block is reached 
     while x > 0 and x < 600 and y > 0 and y < 600:
             
-        if playerAngle > math.pi/4 and playerAngle < math.pi * 3/4:#right quater
+        #right quater    
+        if playerAngle > math.pi/4 and playerAngle < math.pi * 3/4: 
             opposite = ((50 - (x % 50)) * math.tan(playerAngle - (math.pi * 1/2)))
             oppositeL = min((50-(y % 50)) ,max(-ifZero50(y % 50),opposite))
             y = y + oppositeL
@@ -41,8 +46,8 @@ def castRay(playerX,playerY,playerAngle):
             except ZeroDivisionError:
                 x = x + (50 - (x % 50))
                 
-
-        elif playerAngle > math.pi* 5/4 and playerAngle < math.pi * 7/4:#left quater
+        #left quater
+        elif playerAngle > math.pi* 5/4 and playerAngle < math.pi * 7/4: 
             opposite = (ifZero50(x % 50) * math.tan(playerAngle - (math.pi * 3/2)))
             oppositeL = min(ifZero50(y % 50) ,max(-(50-(y % 50)),opposite))
             y = y - oppositeL
@@ -51,7 +56,8 @@ def castRay(playerX,playerY,playerAngle):
             except ZeroDivisionError:
                 x = x - (ifZero50(x % 50))
         
-        elif playerAngle > math.pi * 3/4 and playerAngle < math.pi * 5/4:#down quater
+        #down quater
+        elif playerAngle > math.pi * 3/4 and playerAngle < math.pi * 5/4: 
             opposite = ((50 - (y % 50)) * math.tan(playerAngle - (math.pi)))
             oppositeL = min(ifZero50((x % 50)) ,max(-(50-(x % 50)),opposite))
             x = x - oppositeL
@@ -60,7 +66,8 @@ def castRay(playerX,playerY,playerAngle):
             except ZeroDivisionError:
                 y = y + (50 - (y % 50))
         
-        elif playerAngle > math.pi * 7/4 or playerAngle < math.pi * 1/4:#up quater
+        #up quater
+        elif playerAngle > math.pi * 7/4 or playerAngle < math.pi * 1/4: 
             opposite = (ifZero50(y % 50) * math.tan(playerAngle))
             oppositeL = min((50 - (x % 50)) ,max(-ifZero50(x % 50),opposite))
             x = x + oppositeL
@@ -114,6 +121,7 @@ def movePlayer(keys,playerX,playerY,playerAngle,dt):
 
 run = True
 
+
 #inital postion and orientation of player
 playerX = 75.0
 playerY = 75.0
@@ -124,18 +132,20 @@ moveSpeed = 150
 
 while run:
 
+    #stops program if user try to close window
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            run = False
 
-    #clears screen
-    screen.fill("black")
+    
+    screen.fill("black") #clears screen
 
     #draws map
     for y in range(len(map)):
         for x in range(len(map[0])):
             if map[y][x] == 0:
                 pygame.draw.rect(screen, "gray",pygame.Rect(x * 50,y * 50,50,50),1)
+                pass
             else:
                 pygame.draw.rect(screen, "gray",pygame.Rect(x * 50,y * 50,50,50))
     
@@ -143,16 +153,15 @@ while run:
     pygame.draw.line(screen, "yellow", (playerX, playerY),(playerX + math.sin(playerAngle) * 20, playerY - math.cos(playerAngle) * 20))
     pygame.draw.circle(screen, "yellow", (playerX, playerY),10)
     
-
     
-    #draws rays throught the players fov 4 lines per degree
+    #draws rays
     playerAngle -= math.pi * fov/360
     for offset in range(0,fov * 4):  
         pygame.draw.line(screen, "yellow", (playerX, playerY),castRay(playerX,playerY,playerAngle),2)            
         playerAngle += math.pi/720   
     playerAngle -= math.pi * fov/360
 
-    pygame.display.flip()#updates display surface to the screen
+    pygame.display.flip() #updates display surface to the screen
 
     #move player according to input
     keys = pygame.key.get_pressed()
