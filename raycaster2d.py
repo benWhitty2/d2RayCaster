@@ -1,7 +1,7 @@
 import pygame
 import math
 
-#initalisztions 
+#initializations 
 pygame.init()
 screen = pygame.display.set_mode((600,600))
 clock = pygame.time.Clock()
@@ -29,14 +29,14 @@ def ifZero50(num):
 
 def castRay(playerX,playerY,playerAngle):
     
-    #initalises return values
+    #initialise return values
     x = playerX
     y = playerY
 
-    #casts line box by box untill a solid block is reached 
+    #casts line box by box until a solid block is reached 
     while x > 0 and x < 600 and y > 0 and y < 600:
             
-        #right quater    
+        #right quarter    
         if playerAngle > math.pi/4 and playerAngle < math.pi * 3/4: 
             opposite = ((50 - (x % 50)) * math.tan(playerAngle - (math.pi * 1/2)))
             oppositeL = min((50-(y % 50)) ,max(-ifZero50(y % 50),opposite))
@@ -46,7 +46,7 @@ def castRay(playerX,playerY,playerAngle):
             except ZeroDivisionError:
                 x = x + (50 - (x % 50))
                 
-        #left quater
+        #left quarter
         elif playerAngle > math.pi* 5/4 and playerAngle < math.pi * 7/4: 
             opposite = (ifZero50(x % 50) * math.tan(playerAngle - (math.pi * 3/2)))
             oppositeL = min(ifZero50(y % 50) ,max(-(50-(y % 50)),opposite))
@@ -56,7 +56,7 @@ def castRay(playerX,playerY,playerAngle):
             except ZeroDivisionError:
                 x = x - (ifZero50(x % 50))
         
-        #down quater
+        #down quarter
         elif playerAngle > math.pi * 3/4 and playerAngle < math.pi * 5/4: 
             opposite = ((50 - (y % 50)) * math.tan(playerAngle - (math.pi)))
             oppositeL = min(ifZero50((x % 50)) ,max(-(50-(x % 50)),opposite))
@@ -66,7 +66,7 @@ def castRay(playerX,playerY,playerAngle):
             except ZeroDivisionError:
                 y = y + (50 - (y % 50))
         
-        #up quater
+        #up quarter
         elif playerAngle > math.pi * 7/4 or playerAngle < math.pi * 1/4: 
             opposite = (ifZero50(y % 50) * math.tan(playerAngle))
             oppositeL = min((50 - (x % 50)) ,max(-ifZero50(x % 50),opposite))
@@ -78,10 +78,17 @@ def castRay(playerX,playerY,playerAngle):
             
             
         #if line has reach solid block terminate loop
-        if map[int(y//50)][int(x//50)] == 1 or map[int((y - 0.1)//50)][int(x//50)] == 1 or map[int(y//50)][int((x - 0.1)//50)] == 1:
+        if onSolidBlock(x,y):
             break
  
     return (x,y)
+
+def onSolidBlock(x,y):
+    left = map[int(y//50)][int((x - 0.1)//50)] == 1
+    up = map[int((y - 0.1)//50)][int(x//50)] == 1
+    rightDown = map[int(y//50)][int(x//50)] == 1
+
+    return left or up or rightDown
 
 
 def movePlayer(keys,playerX,playerY,playerAngle,dt):
@@ -122,7 +129,7 @@ def movePlayer(keys,playerX,playerY,playerAngle,dt):
 run = True
 
 
-#inital postion and orientation of player
+#initial position and orientation of player
 playerX = 75.0
 playerY = 75.0
 playerAngle = math.pi/2
@@ -150,7 +157,6 @@ while run:
                 pygame.draw.rect(screen, "gray",pygame.Rect(x * 50,y * 50,50,50))
     
     #draws player
-    pygame.draw.line(screen, "yellow", (playerX, playerY),(playerX + math.sin(playerAngle) * 20, playerY - math.cos(playerAngle) * 20))
     pygame.draw.circle(screen, "yellow", (playerX, playerY),10)
     
     
@@ -169,6 +175,6 @@ while run:
     
     playerAngle = playerAngle % (2 * math.pi)#resets angle with bound of 0 to 2pi
 
-    dtime = clock.tick(30) / 1000#this isues 30 frames per second
+    dtime = clock.tick(30) / 1000#this issues 30 frames per second
 
 
