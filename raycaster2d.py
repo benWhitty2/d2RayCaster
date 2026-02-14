@@ -45,6 +45,7 @@ def castRay(playerX,playerY,playerAngle):
                 x = x + (50 - (x % 50)) * (oppositeL/opposite)
             except ZeroDivisionError:
                 x = x + (50 - (x % 50))
+                print("err")
                 
         #left quarter
         elif playerAngle > math.pi* 5/4 and playerAngle < math.pi * 7/4: 
@@ -55,6 +56,7 @@ def castRay(playerX,playerY,playerAngle):
                 x = x - (ifZero50(x % 50)) * (oppositeL/opposite)
             except ZeroDivisionError:
                 x = x - (ifZero50(x % 50))
+                print("err")
         
         #down quarter
         elif playerAngle > math.pi * 3/4 and playerAngle < math.pi * 5/4: 
@@ -65,6 +67,7 @@ def castRay(playerX,playerY,playerAngle):
                 y = y + (50 - (y % 50)) * (oppositeL/opposite)
             except ZeroDivisionError:
                 y = y + (50 - (y % 50))
+                print("err")
         
         #up quarter
         elif playerAngle > math.pi * 7/4 or playerAngle < math.pi * 1/4: 
@@ -75,6 +78,7 @@ def castRay(playerX,playerY,playerAngle):
                 y = y - ifZero50(y % 50) * (oppositeL/opposite)
             except ZeroDivisionError:
                 y =  y - ifZero50(y % 50) 
+                print("err")
             
             
         #if line has reach solid block terminate loop
@@ -83,6 +87,7 @@ def castRay(playerX,playerY,playerAngle):
  
     return (x,y)
 
+#checks if ray has met the boarder of a solid block
 def onSolidBlock(x,y):
     left = map[int(y//50)][int((x - 0.1)//50)] == 1
     up = map[int((y - 0.1)//50)][int(x//50)] == 1
@@ -91,12 +96,16 @@ def onSolidBlock(x,y):
     return left or up or rightDown
 
 
-def movePlayer(keys,playerX,playerY,playerAngle,dt):
+def movePlayer(keys,playerX,playerY,playerAngle,dt,moveSpeed):
     #turning
     if keys[pygame.K_LEFT]:
         playerAngle -= dt * 2
     elif keys[pygame.K_RIGHT]:
         playerAngle += dt * 2
+
+    #increase speed if sprinting
+    if keys[pygame.K_LSHIFT]:
+        moveSpeed = moveSpeed * 2
 
     #moving
     if keys[pygame.K_w]:
@@ -123,6 +132,10 @@ def movePlayer(keys,playerX,playerY,playerAngle,dt):
         if map[int((playerY + math.sin(playerAngle) * moveSpeed * dt)//50)][int((playerX)//50)] == 0:
             playerY += math.sin(playerAngle) * moveSpeed * dt
     
+    #increase speed if sprinting
+    if keys[pygame.K_LSHIFT]:
+        moveSpeed = moveSpeed / 2
+
     return playerX, playerY, playerAngle
 
 
@@ -135,7 +148,7 @@ playerY = 75.0
 playerAngle = math.pi/2
 dtime = 0
 fov = 70
-moveSpeed = 150
+moveSpeed = 100
 
 while run:
 
@@ -155,6 +168,12 @@ while run:
                 pass
             else:
                 pygame.draw.rect(screen, "gray",pygame.Rect(x * 50,y * 50,50,50))
+
+    font1 = pygame.font.SysFont('chalkduster.ttf', 28)
+    img1 = font1.render('W :Forwards, S: Back, A: Left, D: Right', True, "black")
+    img2 = font1.render('<: Turn Left, >: Turn Right, Shift: Sprint', True, "black")
+    screen.blit(img1, (15, 5))
+    screen.blit(img2, (15, 30))
     
     #draws player
     pygame.draw.circle(screen, "yellow", (playerX, playerY),10)
@@ -171,7 +190,7 @@ while run:
 
     #move player according to input
     keys = pygame.key.get_pressed()
-    playerX, playerY,playerAngle = movePlayer(keys,playerX,playerY,playerAngle,dtime)
+    playerX, playerY,playerAngle = movePlayer(keys,playerX,playerY,playerAngle,dtime,moveSpeed)
     
     playerAngle = playerAngle % (2 * math.pi)#resets angle with bound of 0 to 2pi
 
