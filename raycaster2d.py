@@ -152,7 +152,7 @@ moveSpeed = 100
 
 while run:
 
-    #stops program if user try to close window
+    #stops program if user tries to close window
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
@@ -169,7 +169,8 @@ while run:
             else:
                 pygame.draw.rect(screen, "gray",pygame.Rect(x * 50,y * 50,50,50))
 
-    font1 = pygame.font.SysFont('chalkduster.ttf', 28)
+    #draws instructions
+    font1 = pygame.font.SysFont('', 28)
     img1 = font1.render('W :Forwards, S: Back, A: Left, D: Right', True, "black")
     img2 = font1.render('<: Turn Left, >: Turn Right, Shift: Sprint', True, "black")
     screen.blit(img1, (15, 5))
